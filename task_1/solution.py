@@ -1,25 +1,29 @@
 import csv
 
+from dataclasses import dataclass, field
 
+PersonCountry = dict[str, list | int]
+AggregatoinResult = dict[str, PersonCountry]
+
+
+@dataclass
 class CountryDict:
+    count: int = 0
+    people: list[str] = field(default_factory=list)
 
-    def __init__(self):
-        self.count: int = 0
-        self.people: list[str] = []
 
     @property
-    def values(self) -> dict[str, list | int]:
+    def values(self) -> PersonCountry:
         return {'people': self.people, 'count': self.count}
 
-    # @values.setter
     def add_value(self, person_name: str):
         self.people.append(person_name)
         self.count += 1
 
 
-class Agregator:
+class Aggregator:
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.result_dict: dict[str, CountryDict] = {}
 
     def update(self, person_country: dict[str, str]) -> None:
@@ -30,20 +34,20 @@ class Agregator:
         country_dict.add_value(person)
 
     @property
-    def result(self) -> dict[str, dict[str, list | int]]:
+    def result(self) -> AggregatoinResult:
         return {country_name: country_dict.values for country_name, country_dict in self.result_dict.items()}
 
 
 def main(file_path: str) -> None:
-    agregator = Agregator()
+    aggregator = Aggregator()
 
     with open(file_path, 'r', encoding='utf8') as csv_data_file:
         file_reader = csv.DictReader(csv_data_file, delimiter=',')
 
         for row in file_reader:
-            agregator.update(row)
+            aggregator.update(row)
 
-    agregatoin_result = agregator.result
+    agregatoin_result = aggregator.result
     print(agregatoin_result)
 
 
