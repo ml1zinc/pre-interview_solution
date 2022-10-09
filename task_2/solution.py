@@ -101,6 +101,13 @@ class ListTasksCommand(TaskCommand):
             print(f'\t [{task_num}]: {task}')
 
 
+class DoneListTasksCommand(TaskCommand):
+    def execute(self) -> None:
+        print('Your DONE tasks:')
+        for task in self._database.done:
+            print(f'\t [*]: {list(task.values())[0]}')
+
+
 class DoneStatisticsTasksCommand(TaskCommand):
     def execute(self) -> None:
         done_tasks = self._database.done
@@ -108,8 +115,7 @@ class DoneStatisticsTasksCommand(TaskCommand):
 
         if num_of_done > 0:
             last_done = done_tasks[-1]
-            print(f'{current_date()}: you\'ve completed {num_of_done} tasks! '
-                  f'(last done task {list(last_done.keys())[0]})')
+            print(f'{list(last_done.keys())[0]}: you\'ve completed {num_of_done} tasks! ')
 
         else:
             print('No DONE Tasks')
@@ -118,6 +124,7 @@ class DoneStatisticsTasksCommand(TaskCommand):
 def modify_notification(tasks: list, action: str) -> None:
     task_nums = len(tasks)
     print(f'{task_nums} task{"s" if task_nums > 1 else ""} was {action}!')
+
 
 def current_date() -> str:
     return datetime.today().strftime('%Y.%m.%d')
@@ -130,7 +137,9 @@ def main():
     parser.add_argument('-a', '--add', nargs='+', type=str, help='Adding one or more ToDo tasks. '
                                                                  'Type every task in " "')
     parser.add_argument('-l', '--list', action='store_true', help='Get list of ToDo tasks')
+    parser.add_argument('-la', '--all_list', action='store_true', help='Get list of DONE ToDo tasks')
     parser.add_argument('-ld', '--done_list', action='store_true', help='Get list of DONE ToDo tasks')
+    parser.add_argument('-ls', '--done_statstic', action='store_true', help='Get statistic of DONE ToDo tasks')
 
     # for accept only one command, remove or done
     group = parser.add_mutually_exclusive_group()
@@ -150,7 +159,9 @@ def main():
         remove = args.remove
         done = args.done
         is_list = args.list
-        is_done_stat = args.done_list
+        is_all_list = args.all_list
+        is_done_list = args.done_list
+        is_done_stat = args.done_statstic
 
         if add is not None:
             AddTasksCommand(database).execute(add)
@@ -163,6 +174,14 @@ def main():
 
         if is_list is True:
             ListTasksCommand(database).execute()
+
+        if is_all_list is True:
+            ListTasksCommand(database).execute()
+            DoneListTasksCommand(database).execute()
+            DoneStatisticsTasksCommand(database).execute()
+
+        if is_done_list is True:
+            DoneListTasksCommand(database).execute()
 
         if is_done_stat is True:
             DoneStatisticsTasksCommand(database).execute()
