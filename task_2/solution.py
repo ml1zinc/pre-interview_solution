@@ -2,6 +2,7 @@ import sys
 import json
 import argparse
 
+from abc import ABC
 from os.path import exists
 from datetime import datetime
 
@@ -64,9 +65,38 @@ class DatabaseManager:
         self.done.append({date: complete_task})
 
 
+class TaskCommand(ABC):
+    def __init__(self, database: DatabaseManager) -> None:
+        self._database = database
+
+
+class AddTasksCommand(TaskCommand):
+    def execute(self, tasks: list[str]) -> None:
+        pass
+
+
+class RemoveTasksCommand(TaskCommand):
+    def execute(self, tasks: list[int]) -> None:
+        pass
+
+
+class DoneTasksCommand(TaskCommand):
+    def execute(self, tasks: list[int]) -> None:
+        pass
+
+
+class ListTasksCommand(TaskCommand):
+    def execute(self) -> None:
+        pass
+
+
+class DoneStatisticsTasksCommand(TaskCommand):
+    def execute(self) -> None:
+        pass
+
+
 def current_date() -> str:
     return datetime.today().strftime('%Y.%m.%d')
-
 
 
 def main():
@@ -99,20 +129,20 @@ def main():
         is_done_stat = args.done_list
 
         if add is not None:
-            pass
-          
+            AddTasksCommand(database).execute(add)
+
         if remove is not None:
-            pass
-          
+            RemoveTasksCommand(database).execute(remove)
+
         if done is not None:
-            pass
-          
+            DoneTasksCommand(database).execute(done)
+
         if is_list is True:
-            pass
-          
+            ListTasksCommand(database).execute()
+
         if is_done_stat is True:
-            pass
-          
+            DoneStatisticsTasksCommand(database).execute()
+
 
 if __name__ == '__main__':
     main()
