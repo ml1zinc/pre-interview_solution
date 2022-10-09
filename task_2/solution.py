@@ -72,28 +72,52 @@ class TaskCommand(ABC):
 
 class AddTasksCommand(TaskCommand):
     def execute(self, tasks: list[str]) -> None:
-        pass
+        for task in tasks:
+            self._database.add(task)
+
+        modify_notification(tasks, 'added')
 
 
 class RemoveTasksCommand(TaskCommand):
     def execute(self, tasks: list[int]) -> None:
-        pass
+        for removed_tasks_num, task_idx in enumerate(tasks, start=0):
+            self._database.remove(task_idx - removed_tasks_num)
+
+        modify_notification(tasks, 'removed')
 
 
 class DoneTasksCommand(TaskCommand):
     def execute(self, tasks: list[int]) -> None:
-        pass
+        for done_tasks_num, task_idx in enumerate(tasks, start=0):
+            self._database.set_done(task_idx - done_tasks_num)
+
+        modify_notification(tasks, 'complete')
 
 
 class ListTasksCommand(TaskCommand):
     def execute(self) -> None:
-        pass
+        print('Your tasks:')
+        for task_num, task in enumerate(self._database.tasks, start=START_OF_NUMERATION):
+            print(f'\t [{task_num}]: {task}')
 
 
 class DoneStatisticsTasksCommand(TaskCommand):
     def execute(self) -> None:
-        pass
+        done_tasks = self._database.done
+        num_of_done = len(done_tasks)
 
+        if num_of_done > 0:
+            last_done = done_tasks[-1]
+            print(f'{current_date()}: you\'ve completed {num_of_done} tasks! '
+                  f'(last done task {list(last_done.keys())[0]})')
+
+        else:
+            print('No DONE Tasks')
+
+
+def modify_notification(tasks: list, action: str) -> None:
+    task_nums = len(tasks)
+    print(f'{task_nums} task{"s" if task_nums > 1 else ""} was {action}!')
 
 def current_date() -> str:
     return datetime.today().strftime('%Y.%m.%d')
