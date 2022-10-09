@@ -3,6 +3,7 @@ import json
 import argparse
 
 from os.path import exists
+from datetime import datetime
 
 START_OF_NUMERATION = 1
 
@@ -58,7 +59,13 @@ class DatabaseManager:
 
     def set_done(self, item_id: int):
         complete_task = self.remove(item_id)
+        date = current_date()
 
+        self.done.append({date: complete_task})
+
+
+def current_date() -> str:
+    return datetime.today().strftime('%Y.%m.%d')
 
 
 
