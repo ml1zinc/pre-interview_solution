@@ -96,16 +96,26 @@ class DoneTasksCommand(TaskCommand):
 
 class ListTasksCommand(TaskCommand):
     def execute(self) -> None:
-        print('Your tasks:')
-        for task_num, task in enumerate(self._database.tasks, start=START_OF_NUMERATION):
-            print(f'\t [{task_num}]: {task}')
+        tasks = self._database.tasks
+
+        if len(tasks) > 0:
+            print('Your tasks:')
+            for task_num, task in enumerate(tasks, start=START_OF_NUMERATION):
+                print(f'\t [{task_num}]: {task}')
+        else:
+            print('No Tasks')
 
 
 class DoneListTasksCommand(TaskCommand):
     def execute(self) -> None:
-        print('Your DONE tasks:')
-        for task in self._database.done:
-            print(f'\t [*]: {list(task.values())[0]}')
+        tasks = self._database.done
+
+        if len(tasks) > 0:
+            print('Your DONE tasks:')
+            for task in tasks:
+                print(f'\t [*]: {list(task.values())[0]}')
+        else:
+            print('No DONE Tasks')
 
 
 class DoneStatisticsTasksCommand(TaskCommand):
